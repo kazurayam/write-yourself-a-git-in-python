@@ -20,7 +20,7 @@ class GitRepository(object):
         elif not force:
             raise Exception("Configuration file missing")
         if not force:
-            vers = int(sefl.conf.get("core", "repositoryformatversion"))
+            vers = int(self.conf.get("core", "repositoryformatversion"))
             if vers != 0:
                 raise Exception("Unsupported resitoryformatversion %s" % vers)
 
@@ -49,6 +49,7 @@ class GitRepository(object):
         else:
             return None
 
+
     @classmethod
     def repo_create(cls, path):
         """Create a new repository at path."""
@@ -62,20 +63,26 @@ class GitRepository(object):
                 raise Exception("%s is not empty!" % path)
         else:
             os.makedirs(repo.worktree)
+
         assert(repo.repo_dir("branches", mkdir=True))
         assert(repo.repo_dir("objects", mkdir=True))
         assert(repo.repo_dir("refs", "tags", mkdir=True))
         assert(repo.repo_dir("refs", "heads", mkdir=True))
+
         # .git/description
         with open(repo.repo_file("description"), "w") as f:
             f.write("Unnamed repository; edit this file 'description' to name the repository.\n")
+
         # .git/HEAD
         with open(repo.repo_file("HEAD"), "w") as f:
             f.write("ref: refs/head/master\n")
+
         with open(repo.repo_file("config"), "w") as f:
             config = repo.repo_default_config()
             config.write(f)
+
         return repo
+
 
     @classmethod
     def repo_default_config(cls):
@@ -85,6 +92,7 @@ class GitRepository(object):
         ret.set("core", "filemode", "false")
         ret.set("core", "bare", "false")
         return ret
+
 
     @classmethod
     def repo_find(cls, path=".", required=True):

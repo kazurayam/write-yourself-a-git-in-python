@@ -1,13 +1,17 @@
 import argparse
 import collections
 import configparser
-import hashlib
 import os
 import re
 import sys
 import zlib
 
+from gitblob import GitBlob
+from gitobject import GitObject
 from gitrepository import GitRepository
+from objectutils import object_find
+from objectutils import object_read
+from objectutils import object_write
 
 argparser = argparse.ArgumentParser(description="The stupid content tracker")
 
@@ -33,6 +37,9 @@ def main(argv=sys.argv[1:]):
     elif args.command == "tag"         : cmd_tag(args)
 
 
+# ----------------------------------------------------------
+# init command
+#
 argsp = argsubparsers.add_parser("init", help="Initialize a new, empty repository.")
 
 argsp.add_argument("path",
@@ -45,88 +52,9 @@ def cmd_init(args):
     GitRepository.repo_create(args.path)
 
 
-
-
-class GitObject(object):
-    repo = None
-
-    def __init__(self, repo, data=None):
-        self.repo = repo
-        if data != None:
-            self.deserialize(data)
-
-    def deserialize(self):
-        """This function must be implemented by subclasses.
-It must read the object's contents from self.data, a byte string, and do whatever it takes to convert it into a meaningful representation.
-What exactly that means depends on each subclass."""
-        raise Exception("Unimplemented!")
-
-    def deserialize(self, data):
-        raise Exception("Unimplemented")
-
-
-def object_read(repo, sha):
-    """Read object object_id from Git repository repo. Return a
-GitObject whose exact type depends on the Object."""
-
-    path = repo.repo_file("objects", sha[0:2], sha[2:])
-
-    with open(path, "rb") as f:
-        raw = zlib.decompress(f.read())
-
-        # Read object type
-        x = raw.find(b' ')
-        fmt = raw[0:x]
-
-        # Read and validate object size
-        y = raw.find(b'x00', x)
-        size = int(raw[x:y].decode("ascii"))
-        if size != len(raw)-y-1:
-            raise Exception("Malformed object {0}: bad length".format(sha))
-
-        # Pick constructor
-        if   fmt==b'commit' : c=GitCommit
-        elif fmt==b'tree'   : c=GitTree
-        elif fmt==b'tag'    : c=GitTag
-        elif fmt==b'blob'   : c=GitBlob
-        else:
-            raise Exception("Unknown type {0} for object {1}".format(fmt.decode("ascii"), sha))
-
-        # Call constructor and return object
-        return c(repo, raw[y+1:])
-
-
-def object_write(obj, actually_write=True):
-    # Serialize object data
-    data = obj.serialize()
-    # Add header
-    result = obj.fmt + b' ' + str(len(data)).encode() + b'x00' + data
-    # Compute hash
-    sha = hashlib.sha1(result).hexdigest()
-
-    if actually_write:
-        # Compute path
-        path=obj.repo.repo_file("objects", sha[0:2], sha[2:], mkdir=actually_write)
-
-        with open(path, 'wb') as f:
-            # Compress and write
-            f.write(zlib.compress(result))
-
-    return sha
-
-
-
-class GitBlob(GitObject):
-    fmt=b'blob'
-
-    def serialize(self):
-        return self.blobdata
-
-    def deserialize(self, data):
-        self.blobdata = data
-
-
-
+# ----------------------------------------------------------
+# cat-file command
+#
 argsp = argsubparsers.add_parser(
     "cat-file",
     help="Provide content of repository object")
@@ -151,7 +79,9 @@ def cat_file(repo, obj, fmt=None):
     sys.stdout.buffer.write(obj.serialize())
 
 
-
+# ----------------------------------------------------------
+# hash-object command
+#
 argsp = argsubparsers.add_parser(
     "hash-object",
     help="Compute object ID and optionally creates a blob from a file")
@@ -174,12 +104,12 @@ argsp.add_argument(
     "path",
     help="Read object from <file>")
 
+
 def cmd_hash_object(args):
     if args.write:
         repo = GitRepository(".")
     else:
         repo = None
-
     with open(args.path, "rb") as fd:
         sha = object_hash(fd, args.type.encode(), repo)
         print(sha)
@@ -188,10 +118,10 @@ def object_hash(fd, fmt, repo=None):
     data = fd.read()
     # Choose constructor depending on
     # object type found in header.
-    if   fmt==b'commit' : obj=GitCommit(repo, data)
-    elif fmt==b'tree'   : obj=GitTree(repo, data)
-    elif fmt==b'tag'    : obj=GitTag(repo, data)
-    elif fmt==b'blob'   : obj=GitBlob(repo, data)
+    if   fmt==b'commit': obj=GitCommit(repo, data)
+    elif fmt==b'tree'  : obj=GitTree(repo, data)
+    elif fmt==b'tag'   : obj=GitTag(repo, data)
+    elif fmt==b'blob'  : obj=GitBlob(repo, data)
     else:
         raise Exception("Unknown type %s!" % fmt)
     return object_write(obj, repo)
