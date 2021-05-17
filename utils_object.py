@@ -44,7 +44,6 @@ GitObject whose exact type depends on the Object."""
     return c(repo, raw[y+1:])
 
 
-
 def object_write(obj, actually_write=True):
     # Serialize object data
     data = obj.serialize()
@@ -60,7 +59,6 @@ def object_write(obj, actually_write=True):
             # Compress and write
             f.write(zlib.compress(result))
     return sha
-
 
 
 def object_resolve(repo, name):
@@ -102,8 +100,6 @@ This function is aware of;
                 if f.startswith(rem):
                     candidates.append(prefix + f)
     return candidates
-
-
 
 
 def object_find(repo, name, fmt=None, follow=True):

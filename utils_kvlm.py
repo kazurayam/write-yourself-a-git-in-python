@@ -53,7 +53,6 @@ def kvlm_parse(raw, start=0, dct=None):
     return kvlm_parse(raw, start=end+1, dct=dct)
 
 
-
 def kvlm_serialize(kvlm):
     ret = b''
 

@@ -48,7 +48,7 @@ def repo_dir(repo, *path, mkdir=False):
     path = repo_path(repo, *path)
 
     if os.path.exists(path):
-        if (os.path.isdir(path)):
+        if os.path.isdir(path):
             return path
         else:
             raise Exception("Not a directory %s" % path)
@@ -58,7 +58,6 @@ def repo_dir(repo, *path, mkdir=False):
         return path
     else:
         return None
-
 
 
 def repo_create(path):
@@ -95,7 +94,6 @@ def repo_create(path):
         return repo
 
 
-
 def repo_default_config():
     ret = configparser.ConfigParser()
     ret.add_section("core")
@@ -103,7 +101,6 @@ def repo_default_config():
     ret.set("core", "filemode", "false")
     ret.set("core", "bare", "false")
     return ret
-
 
 
 def repo_find(path=".", required=True):

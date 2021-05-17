@@ -18,5 +18,5 @@ It must read the object's contents from self.data, a byte string, and do whateve
 What exactly that means depends on each subclass."""
         raise Exception("Unimplemented!")
 
-    def deserialize(self, data):
+    def serialize(self, data):
         raise Exception("Unimplemented")

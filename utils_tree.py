@@ -1,6 +1,3 @@
-
-
-
 class GitTreeLeaf(object):
     def __init__(self, mode, path, sha):
         self.mode = mode
@@ -30,7 +27,6 @@ def tree_parse_one(raw, start=0):
     return y+21, GitTreeLeaf(mode, path, sha)
 
 
-
 def tree_parse(raw):
     pos = 0
     max = len(raw)
@@ -41,9 +37,8 @@ def tree_parse(raw):
     return ret
 
 
-
 def tree_serialize(obj):
-    #@FIXME Add serializer!
+    # @FIXME Add serializer!
     ret = b''
     for i in obj.items:
         ret += i.mode

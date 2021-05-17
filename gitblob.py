@@ -1,7 +1,7 @@
 from gitobject import GitObject
 
 class GitBlob(GitObject):
-    fmt=b'blob'
+    fmt = b'blob'
 
     def serialize(self):
         return self.blobdata

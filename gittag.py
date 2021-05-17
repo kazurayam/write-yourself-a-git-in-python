@@ -1,4 +1,4 @@
 from gitobject import GitObject
 
 class GitTag(GitObject):
-    fmt=b'tag'
+    fmt = b'tag'
