@@ -123,3 +123,25 @@ def object_hash(fd, fmt, repo=None):
     else:
         raise Exception("Unknown type %s!" % fmt)
     return object_write(obj, repo)
+
+
+
+# ----------------------------------------------------------
+# ls-tree command
+#
+argsp = argsubparsers.add_parser("ls-tree", help="Pretty-print a tree object")
+argsp.add_argument("object",
+                   help="The objct to show")
+
+
+def cmd_ls_tree(args):
+    repo = GitRepository.repo_find()
+    obj = object_read(repo, object_find(repo, args.object, fmt=b'tree'))
+
+    for item in obj.items:
+        print("{0} {1} {2}\t{3}".format(
+            "0" * (6 - len(item.mode)) + item.mode.decode("ascii"),
+            object_read(repo, item.sha).fmt.decode("ascii"),
+            item.sha,
+            item.path.decode("ascii")
+            ))

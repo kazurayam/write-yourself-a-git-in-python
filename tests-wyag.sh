@@ -110,8 +110,16 @@ git add a/*
 GIT_AUTHOR_DATE="2010-01-01 01:02:03" \
                GIT_COMMITTER_DATE="2010-01-01 01:02:03" \
                git commit --no-gpg-sign -m "Commit 2" > /dev/null
+cd ../right
+mkdir a
+echo "Alpha" > a/greek_letters
+mkdir b
+echo "Hamza" > a/arabic_letters
+git add a/*
+GIT_AUTHOR_DATE="2010-01-01 01:02:03" \
+               GIT_COMMITTER_DATE="2010-01-01 01:02:03" \
+               git commit --no-gpg-sign -m "Commit 2" > /dev/null
 cd ..
-
 
 step ls-tree
 cd left
