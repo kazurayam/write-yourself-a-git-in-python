@@ -128,3 +128,19 @@ cd ../right
 git ls-tree HEAD > ../file2
 cd ..
 cmp file1 file2
+
+
+
+# ----------------------------------------------------------
+# checkout command
+#
+step checkout
+# Git and Wyag syntax are different here
+cd left
+$wyag checkout HEAD ../temp1
+mkdir ../temp2
+cd ../temp2
+git --git-dir=../right/.git checkout .
+cd ..
+diff -r temp1 temp2
+rm -rf temp1 temp2
