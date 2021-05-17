@@ -108,21 +108,27 @@ This function is aware of;
 
 def object_find(repo, name, fmt=None, follow=True):
     sha = object_resolve(repo, name)
+
     if not sha:
         raise Exception("No such reference {0}.".format(name))
+
     if len(sha) > 1:
         raise Exception("Ambiguous reference {0}: candidates are:\n - {1}".format(name, "\n - ".join(sha)))
 
     sha = sha[0]
+
     if not fmt:
         return sha
 
     while True:
         obj = object_read(repo, sha)
+
         if obj.fmt == fmt:
             return sha
+
         if not follow:
             return None
+
         # Follow tags
         if obj.fmt == b'tag':
             sha = obj.kvlm[b'object'].decode("ascii")

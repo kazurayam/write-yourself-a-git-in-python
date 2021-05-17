@@ -1,39 +1,51 @@
 import argparse
-import collections
-import configparser
 import os
-import re
 import sys
-import zlib
 
 from gitblob import GitBlob
-from gitobject import GitObject
+from gitcommit import GitCommit
+from gittag import GitTag
+from gittree import GitTree
 from gitrepository import GitRepository, repo_create, repo_find
 from utils_object import object_find, object_read, object_write
-
 
 argparser = argparse.ArgumentParser(description="The stupid content tracker")
 
 argsubparsers = argparser.add_subparsers(title="Commands", dest="command")
 argsubparsers.required = True
 
+
 def main(argv=sys.argv[1:]):
     args = argparser.parse_args(argv)
 
-    if   args.command == "add"         : cmd_add(args)
-    elif args.command == "cat-file"    : cmd_cat_file(args)
-    elif args.command == "checkout"    : cmd_checkout(args)
-    elif args.command == "commit"      : cmd_commit(args)
-    elif args.command == "hash-object" : cmd_hash_object(args)
-    elif args.command == "init"        : cmd_init(args)
-    elif args.command == "log"         : cmd_log(args)
-    elif args.command == "ls-tree"     : cmd_ls_tree(args)
-    elif args.command == "merge"       : cmd_merge(args)
-    elif args.command == "rebase"      : cmd_rebase(args)
-    elif args.command == "rev-parse"   : cmd_rev_parse(args)
-    elif args.command == "rm"          : cmd_rm(args)
-    elif args.command == "show-ref"    : cmd_show_ref(args)
-    elif args.command == "tag"         : cmd_tag(args)
+    if args.command == "add":
+        cmd_add(args)
+    elif args.command == "cat-file":
+        cmd_cat_file(args)
+    elif args.command == "checkout":
+        cmd_checkout(args)
+    elif args.command == "commit":
+        cmd_commit(args)
+    elif args.command == "hash-object":
+        cmd_hash_object(args)
+    elif args.command == "init":
+        cmd_init(args)
+    elif args.command == "log":
+        cmd_log(args)
+    elif args.command == "ls-tree":
+        cmd_ls_tree(args)
+    elif args.command == "merge":
+        cmd_merge(args)
+    elif args.command == "rebase":
+        cmd_rebase(args)
+    elif args.command == "rev-parse":
+        cmd_rev_parse(args)
+    elif args.command == "rm":
+        cmd_rm(args)
+    elif args.command == "show-ref":
+        cmd_show_ref(args)
+    elif args.command == "tag":
+        cmd_tag(args)
 
 
 # ----------------------------------------------------------
@@ -45,7 +57,8 @@ argsp.add_argument("path",
                    metavar="directory",
                    nargs="?",
                    default=".",
-                    help="Where to create the repository.")
+                   help="Where to create the repository.")
+
 
 def cmd_init(args):
     repo_create(args.path)
@@ -69,9 +82,11 @@ argsp.add_argument(
     metavar="object",
     help="The object to display")
 
+
 def cmd_cat_file(args):
     repo = repo_find()
     cat_file(repo, args.object, fmt=args.type.encode())
+
 
 def cat_file(repo, obj, fmt=None):
     obj = object_read(repo, object_find(repo, obj, fmt))
@@ -113,18 +128,22 @@ def cmd_hash_object(args):
         sha = object_hash(fd, args.type.encode(), repo)
         print(sha)
 
+
 def object_hash(fd, fmt, repo=None):
     data = fd.read()
     # Choose constructor depending on
     # object type found in header.
-    if   fmt==b'commit': obj=GitCommit(repo, data)
-    elif fmt==b'tree'  : obj=GitTree(repo, data)
-    elif fmt==b'tag'   : obj=GitTag(repo, data)
-    elif fmt==b'blob'  : obj=GitBlob(repo, data)
+    if fmt == b'commit':
+        obj = GitCommit(repo, data)
+    elif fmt == b'tree':
+        obj = GitTree(repo, data)
+    elif fmt == b'tag':
+        obj = GitTag(repo, data)
+    elif fmt == b'blob':
+        obj = GitBlob(repo, data)
     else:
         raise Exception("Unknown type %s!" % fmt)
     return object_write(obj, repo)
-
 
 
 # ----------------------------------------------------------
@@ -145,7 +164,7 @@ def cmd_ls_tree(args):
             object_read(repo, item.sha).fmt.decode("ascii"),
             item.sha,
             item.path.decode("ascii")
-            ))
+        ))
 
 
 # ----------------------------------------------------------
@@ -158,6 +177,7 @@ argsp.add_argument("commit",
 
 argsp.add_argument("path",
                    help="The EMPTY directory to checkout on.")
+
 
 def cmd_checkout(args):
     repo = repo_find()
@@ -193,7 +213,6 @@ def tree_checkout(repo, tree, path):
                 f.write(obj.blobdata)
 
 
-
 # ----------------------------------------------------------
 # rev-parse command
 #
@@ -203,16 +222,17 @@ argsp = argsubparsers.add_parser(
 
 argsp.add_argument("--wyag-type",
                    metavar="type",
-                    dest="type",
-                    choices=["blob", "commit", "tag", "tree"],
-                    default=None,
-                    help="Specify the expected type")
+                   dest="type",
+                   choices=["blob", "commit", "tag", "tree"],
+                   default=None,
+                   help="Specify the expected type")
 
 argsp.add_argument("name",
                    help="The name to parse")
+
 
 def cmd_rev_parse(args):
     if args.type:
         fmt = args.type.encode()
     repo = repo_find()
-    print (object_find(repo, args.name, args.type, follow=True))
+    print(object_find(repo, args.name, args.type, follow=True))

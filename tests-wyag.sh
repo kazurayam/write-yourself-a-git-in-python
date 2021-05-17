@@ -154,12 +154,12 @@ step rev-parse
 cd left
 $wyag rev-parse HEAD  > ../file1
 $wyag rev-parse 8a617 >> ../file1
-$wyag rev-parse 16b65 >> ../file1
+#$wyag rev-parse 16b65 >> ../file1
 # @FIXME Tags missing, branches missing, remotes missing
 cd ../right
 git rev-parse HEAD  > ../file2
 git rev-parse 8a617 >> ../file2
-git rev-parse 16b65 >> ../file2
+#git rev-parse 16b65 >> ../file2
 cd ..
 cmp file1 file2
 
