@@ -1,6 +1,6 @@
 from gitblob import GitBlob
 from gitcommit import GitCommit
-from gitrepository import GitRepository
+from gitrepository import GitRepository, repo_file, repo_dir
 from gittag import GitTag
 from gittree import GitTree
 from utils_ref import ref_resolve
@@ -13,7 +13,7 @@ def object_read(repo, sha):
     """Read object object_id from Git repository repo. Return a
 GitObject whose exact type depends on the Object."""
 
-    path = repo.repo_file("objects", sha[0:2], sha[2:])
+    path = repo_file(repo, "objects", sha[0:2], sha[2:])
 
     with open(path, "rb") as f:
         raw = zlib.decompress(f.read())
@@ -55,7 +55,7 @@ def object_write(obj, actually_write=True):
 
     if actually_write:
         # Compute pathlib
-        path=obj.repo.repo_file("objects", sha[0:2], sha[2:], mkdir=actually_write)
+        path = repo_file(obj.repo, "objects", sha[0:2], sha[2:], mkdir=actually_write)
         with open(path, 'wb') as f:
             # Compress and write
             f.write(zlib.compress(result))
@@ -95,7 +95,7 @@ This function is aware of;
         # for git to consider something a short hash.
         name = name.lower()
         prefix = name[0:2]
-        path = repo.repo_dir("objects", prefix, mkdir=False)
+        path = repo_dir(repo, "objects", prefix, mkdir=False)
         if path:
             rem = name[2:]
             for f in os.listdir(path):

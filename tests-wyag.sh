@@ -144,3 +144,28 @@ git --git-dir=../right/.git checkout .
 cd ..
 diff -r temp1 temp2
 rm -rf temp1 temp2
+
+
+
+# ----------------------------------------------------------
+# rev-parse command
+#
+step rev-parse
+cd left
+$wyag rev-parse HEAD  > ../file1
+$wyag rev-parse 8a617 >> ../file1
+$wyag rev-parse 16b65 >> ../file1
+# @FIXME Tags missing, branches missing, remotes missing
+cd ../right
+git rev-parse HEAD  > ../file2
+git rev-parse 8a617 >> ../file2
+git rev-parse 16b65 >> ../file2
+cd ..
+cmp file1 file2
+
+step "rev-parse (wyag redirection tester)"
+# @TODO
+
+step THIS WAS A TRIUMPH
+step "I'M MAKING A NOTE HERE"
+step "HUGE SUCCESS"

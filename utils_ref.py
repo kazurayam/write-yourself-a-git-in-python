@@ -1,11 +1,11 @@
 import collections
 
-from gitrepository import GitRepository
+from gitrepository import GitRepository, repo_file
 
 import os
 
 def ref_resolve(repo, ref):
-    with open(GitRepository.repo_file(repo, ref), 'r') as fp:
+    with open(repo_file(repo, ref), 'r') as fp:
         data = fp.read()[:-1]
         # Drop final \n ^^^^^
     if data.startswith("ref: "):

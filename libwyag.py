@@ -8,8 +8,9 @@ import zlib
 
 from gitblob import GitBlob
 from gitobject import GitObject
-from gitrepository import GitRepository
+from gitrepository import GitRepository, repo_create, repo_find
 from utils_object import object_find, object_read, object_write
+
 
 argparser = argparse.ArgumentParser(description="The stupid content tracker")
 
@@ -47,7 +48,7 @@ argsp.add_argument("path",
                     help="Where to create the repository.")
 
 def cmd_init(args):
-    GitRepository.repo_create(args.path)
+    repo_create(args.path)
 
 
 # ----------------------------------------------------------
@@ -69,7 +70,7 @@ argsp.add_argument(
     help="The object to display")
 
 def cmd_cat_file(args):
-    repo = GitRepository.repo_find()
+    repo = repo_find()
     cat_file(repo, args.object, fmt=args.type.encode())
 
 def cat_file(repo, obj, fmt=None):
@@ -135,7 +136,7 @@ argsp.add_argument("object",
 
 
 def cmd_ls_tree(args):
-    repo = GitRepository.repo_find()
+    repo = repo_find()
     obj = object_read(repo, object_find(repo, args.object, fmt=b'tree'))
 
     for item in obj.items:
@@ -159,7 +160,7 @@ argsp.add_argument("path",
                    help="The EMPTY directory to checkout on.")
 
 def cmd_checkout(args):
-    repo = GitRepository.repo_find()
+    repo = repo_find()
 
     obj = object_read(repo, object_find(repo, args.commit))
 
@@ -190,3 +191,28 @@ def tree_checkout(repo, tree, path):
         elif obj.fmt == b'blob':
             with open(dest, 'wb') as f:
                 f.write(obj.blobdata)
+
+
+
+# ----------------------------------------------------------
+# rev-parse command
+#
+argsp = argsubparsers.add_parser(
+    "rev-parse",
+    help="Parse revision (or other objcts)identifiers")
+
+argsp.add_argument("--wyag-type",
+                   metavar="type",
+                    dest="type",
+                    choices=["blob", "commit", "tag", "tree"],
+                    default=None,
+                    help="Specify the expected type")
+
+argsp.add_argument("name",
+                   help="The name to parse")
+
+def cmd_rev_parse(args):
+    if args.type:
+        fmt = args.type.encode()
+    repo = repo_find()
+    print (object_find(repo, args.name, args.type, follow=True))
