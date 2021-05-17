@@ -85,3 +85,19 @@ class GitRepository(object):
         ret.set("core", "filemode", "false")
         ret.set("core", "bare", "false")
         return ret
+
+    @classmethod
+    def repo_find(cls, path=".", required=True):
+        path = os.path.realpath(path)
+        if os.path.isdir(os.path.join(path, ".git")):
+            return GitRepository(path)
+        # If we haven't returned, recurse in parent,
+        parent = os.path.realpath(os.path.join(path, ".."))
+        if parent == path:
+            # Bottom case
+            if required:
+                raise Exception("No git directory.")
+            else:
+                return None
+        # Recursive case
+        return repo_find(parent, required)
