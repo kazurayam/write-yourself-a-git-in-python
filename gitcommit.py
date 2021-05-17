@@ -1,5 +1,5 @@
 from gitobject import GitObject
-from kvlmutils import kvlm_parse, kvlm_serialize
+from utils_kvlm import kvlm_parse, kvlm_serialize
 
 class GitCommit(GitObject):
     fmt=b'commit'

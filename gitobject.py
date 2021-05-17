@@ -2,7 +2,7 @@ import hashlib
 import re
 import zlib
 
-from refutils import ref_resolve
+from utils_ref import ref_resolve
 
 class GitObject(object):
     repo = None

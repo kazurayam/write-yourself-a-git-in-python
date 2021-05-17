@@ -3,7 +3,7 @@ from gitcommit import GitCommit
 from gitrepository import GitRepository
 from gittag import GitTag
 from gittree import GitTree
-from refutils import ref_resolve
+from utils_ref import ref_resolve
 import hashlib
 import re
 import os

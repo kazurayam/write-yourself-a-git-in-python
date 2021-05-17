@@ -9,9 +9,7 @@ import zlib
 from gitblob import GitBlob
 from gitobject import GitObject
 from gitrepository import GitRepository
-from objectutils import object_find
-from objectutils import object_read
-from objectutils import object_write
+from utils_object import object_find, object_read, object_write
 
 argparser = argparse.ArgumentParser(description="The stupid content tracker")
 
